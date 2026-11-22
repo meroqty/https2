@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Echo</title>
+</head>
+<body>
+    <h1>WebSocket Echo-клиент</h1>
+
+    <p id="status">Подключение...</p>
+
+    <input id="message" placeholder="Введите сообщение">
+    <button onclick="sendMessage()">Отправить</button>
+
+    <h3>История сообщений:</h3>
+    <pre id="log"></pre>
+
+    <script>
+        const socket = new WebSocket("ws://127.0.0.1:9001");
+
+        function log(text) {
+            document.getElementById("log").textContent += text + "\n";
+        }
+
+        socket.onopen = function() {
+            document.getElementById("status").textContent =
+                "Подключено к серверу!";
+            log("Соединение установлено");
+        };
+
+        socket.onmessage = function(event) {
+            log("Получено: " + event.data);
+        };
+
+        socket.onerror = function() {
+            log("Ошибка соединения");
+        };
+
+        socket.onclose = function() {
+            document.getElementById("status").textContent =
+                "Соединение закрыто";
+        };
+
+        function sendMessage() {
+            const text = document.getElementById("message").value;
+
+            if (socket.readyState !== WebSocket.OPEN) {
+                log("Сервер ещё не подключён!");
+                return;
+            }
+
+            socket.send(text);
+            log("Отправлено: " + text);
+        }
+    </script>
+</body>
+</html>
